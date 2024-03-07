@@ -13,7 +13,7 @@ function unmarkPage(){
 function markPage(){
     unmarkPage();
 
-    // var bodyRect = document.body.getBoundingClientRect();
+    // let bodyRect = document.body.getBoundingClientRect();
     let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
@@ -71,34 +71,48 @@ function markPage(){
         }
         return color;
     }
+    function appendStyle (el, style) {
+        Object.entries(style).forEach(([key, value]) => {
+            el.style[key] = value;
+        })
+    }
 
     // Lets create a floating border on top of these elements that will always be visible
     elItems.forEach(function (item, index) {
         item.rects.forEach((bbox) => {
-            newElement = document.createElement("div");
-            var borderColor = getRandomColor();
-            newElement.style.outline = `2px dashed ${borderColor}`;
-            newElement.style.position = "fixed";
-            newElement.style.left = bbox.left + "px";
-            newElement.style.top = bbox.top + "px";
-            newElement.style.width = bbox.width + "px";
-            newElement.style.height = bbox.height + "px";
-            newElement.style.pointerEvents = "none";
-            newElement.style.boxSizing = "border-box";
-            newElement.style.zIndex = 2147483647;
-            // newElement.style.background = `${borderColor}80`;
+            newElement = document.createElement('div');
+            let borderColor = getRandomColor();
+            const elementStyle = {
+                outline: `2px dashed ${borderColor}`,
+                position: 'fixed',
+                top: bbox.top + 'px',
+                left: bbox.left + 'px',
+                width: bbox.width + 'px',
+                height: bbox.height + 'px',
+                pointerEvents: 'none',
+                boxSizing: 'border-box',
+                zIndex: 2147483647,
+                // background: `${borderColor}80`
+            }
+            appendStyle(newElement, elementStyle);
+
             // Add floating label at the corner
-            var label = document.createElement("span");
-            label.textContent = index;
-            label.style.position = "absolute";
-            label.style.top = "-19px";
-            label.style.left = "0px";
-            label.style.background = borderColor;
-            label.style.color = "white";
-            label.style.padding = "2px 4px";
-            label.style.fontSize = "12px";
-            label.style.borderRadius = "2px";
-            newElement.appendChild(label);
+            if (bbox.width > 20 || bbox.height > 40) {
+                let label = document.createElement('span');
+                let labelStyle = {
+                    position: 'absolute',
+                    background: borderColor,
+                    color: 'white',
+                    padding: '2px 4px',
+                    fontSize: '12px',
+                    borderRadius: '2px',
+                    whiteSpace: 'nowrap',
+                    transform: `${bbox.top > 20 ? 'translate(-2px, -100%)' : 'translate(-100%, -2px)'} scale(0.8)`,
+                }
+                appendStyle(label, labelStyle);
+                label.textContent = index;
+                newElement.appendChild(label);
+            }
 
             document.body.appendChild(newElement);
             labels.push(newElement);
