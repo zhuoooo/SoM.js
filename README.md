@@ -1,2 +1,20 @@
 # SoM.js
-用于各种场景的网页视觉效果标记。
+用于实现各种场景的网页视觉效果标记的功能。
+
+## 标记文字
+
+text/index.js
+
+#### 效果
+
+![](D:\github\SoM.js\assets\text.png)
+
+### 
+
+### 标记可点击的内容
+
+clickable/index.js
+
+#### 效果
+
+![](D:\github\SoM.js\assets\clickable.png)
