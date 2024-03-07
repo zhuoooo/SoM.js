@@ -7,7 +7,7 @@ text/index.js
 
 #### 效果
 
-![](D:\github\SoM.js\assets\text.png)
+![](./assets/text.png)
 
 ### 
 
@@ -17,4 +17,4 @@ clickable/index.js
 
 #### 效果
 
-![](D:\github\SoM.js\assets\clickable.png)
+![](./assets/clickable.png)
