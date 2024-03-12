@@ -47,11 +47,12 @@ function markPage(){
         });
 
         let area = rects.reduce((acc, rect) => acc + rect.width * rect.height, 0);
+        const tagName = element.tagName.toUpperCase();
 
         return {
             element: element,
             include:
-                ['IMG', 'SVG', 'CANVAS', 'INPUT'].includes(element.tagName) || 
+                ['IMG', 'SVG', 'CANVAS', 'INPUT'].includes(tagName) || 
                 [...element.childNodes].some(el => el.nodeType === Node.TEXT_NODE && el.nodeValue.trim() !== '')
             ,
             area,

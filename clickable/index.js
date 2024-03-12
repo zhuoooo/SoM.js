@@ -17,9 +17,21 @@ function markPage() {
     let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
-    let elItems = Array.prototype.slice.call(
+    let elItems = [];
+
+    Array.prototype.slice.call(
         document.querySelectorAll('body *')
     ).map(function (element) {
+        // 判断添加了 cursor 事件的嵌套场景
+        const isSame = elItems.some(item => {
+            const tarCursor = window.getComputedStyle(element).cursor;
+            const srcCursor = window.getComputedStyle(item.element).cursor;
+
+            return item.element.contains(element) &&  tarCursor === srcCursor;
+        })
+        if (isSame) {
+            return;
+        }
 
         // 获取元素的所有客户端矩形区域，过滤并转换成自定义的rect对象
         let rects = [...element.getClientRects()].filter(bb => {
@@ -47,20 +59,19 @@ function markPage() {
         });
 
         let area = rects.reduce((acc, rect) => acc + rect.width * rect.height, 0);
+        const tagName = element.tagName.toUpperCase();
+        const clickableEl = ['BUTTON', 'SELECT', 'TEXTAREA', 'INPUT', 'A', 'VIDEO', 'IFRAME'].includes(tagName) ||
+            (element.onclick != null) || window.getComputedStyle(element).cursor == 'pointer';
 
-        return {
-            element: element,
-            include:
-                (element.tagName === "INPUT" || element.tagName === "TEXTAREA" || element.tagName === "SELECT") ||
-                (element.tagName === "BUTTON" || element.tagName === "A" || (element.onclick != null) || window.getComputedStyle(element).cursor == "pointer") ||
-                (element.tagName === "IFRAME" || element.tagName === "VIDEO"),
-            area,
-            rects,
-            text: element.textContent.trim().replace(/\s{2,}/g, ' ')
-        };
-    }).filter(item =>
-        item.include && (item.area >= 20)
-    );
+        if (area >= 20 && clickableEl) {
+            elItems.push({
+                element: element,
+                area,
+                rects,
+                text: element.textContent.trim().replace(/\s{2,}/g, ' ')
+            })
+        }
+    });
 
     // Only keep inner clickable elItems
     elItems = elItems.filter(x => !elItems.some(y => x.element.contains(y.element) && !(x == y)))
