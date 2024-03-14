@@ -1,5 +1,6 @@
 // DOM Labeler
 let labels = [];
+let text = [];
 
 // 清除
 function unmarkPage(){
@@ -48,20 +49,23 @@ function markPage(){
 
         let area = rects.reduce((acc, rect) => acc + rect.width * rect.height, 0);
         const tagName = element.tagName.toUpperCase();
+        const hasTextChild = [...element.childNodes].some(el => el.nodeType === Node.TEXT_NODE && el.nodeValue.trim() !== '')
 
         return {
             element: element,
             include:
-                ['IMG', 'SVG', 'CANVAS', 'INPUT'].includes(tagName) || 
-                [...element.childNodes].some(el => el.nodeType === Node.TEXT_NODE && el.nodeValue.trim() !== '')
-            ,
+                ['IMG', 'SVG', 'CANVAS', 'INPUT'].includes(tagName) ||
+                hasTextChild,
             area,
             rects,
             text: element.textContent.trim().replace(/\s{2,}/g, ' ')
         };
-    }).filter(item =>
-        item.include && (item.area >= 20)
-    );
+    });
+
+    elItems = elItems.filter(item => {
+
+        return item.include && (item.area >= 20)
+    })
 
     // Function to generate random colors
     function getRandomColor(){
@@ -108,7 +112,10 @@ function markPage(){
                     fontSize: '12px',
                     borderRadius: '2px',
                     whiteSpace: 'nowrap',
-                    transform: `${bbox.top > 20 ? 'translate(-2px, -100%)' : 'translate(-100%, -2px)'} scale(0.8)`,
+                    // left: '50%',
+                    // top: '50%',
+                    // transform: 'translate(-50%, -50%)',
+                    transform: `${bbox.top > 20 ? 'translate(-2px, -100%)' : 'translate(-100%, -2px)'}`,
                 }
                 appendStyle(label, labelStyle);
                 label.textContent = index;
@@ -118,6 +125,12 @@ function markPage(){
             document.body.appendChild(newElement);
             labels.push(newElement);
 
+            if (item.textContent) {
+                text.push({
+                    element: index,
+                    text: item.textContent
+                })
+            }
         });
     })
 }

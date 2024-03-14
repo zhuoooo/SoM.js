@@ -27,7 +27,7 @@ function markPage() {
             const tarCursor = window.getComputedStyle(element).cursor;
             const srcCursor = window.getComputedStyle(item.element).cursor;
 
-            return item.element.contains(element) &&  tarCursor === srcCursor;
+            return item.element.contains(element) && tarCursor === srcCursor;
         })
         if (isSame) {
             return;
@@ -60,7 +60,7 @@ function markPage() {
 
         let area = rects.reduce((acc, rect) => acc + rect.width * rect.height, 0);
         const tagName = element.tagName.toUpperCase();
-        const clickableEl = ['BUTTON', 'SELECT', 'TEXTAREA', 'INPUT', 'A', 'VIDEO', 'IFRAME'].includes(tagName) ||
+        const clickableEl = ['BUTTON', 'SELECT', /*'TEXTAREA', 'INPUT', */ 'A', 'VIDEO', 'IFRAME'].includes(tagName) ||
             (element.onclick != null) || window.getComputedStyle(element).cursor == 'pointer';
 
         if (area >= 20 && clickableEl) {
@@ -85,34 +85,51 @@ function markPage() {
         }
         return color;
     }
+    function appendStyle(el, style) {
+        Object.entries(style).forEach(([key, value]) => {
+            el.style[key] = value;
+        })
+    }
 
     // Lets create a floating border on top of these elements that will always be visible
     elItems.forEach(function (item, index) {
         item.rects.forEach((bbox) => {
             newElement = document.createElement("div");
-            var borderColor = getRandomColor();
-            newElement.style.outline = `2px dashed ${borderColor}`;
-            newElement.style.position = "fixed";
-            newElement.style.left = bbox.left + "px";
-            newElement.style.top = bbox.top + "px";
-            newElement.style.width = bbox.width + "px";
-            newElement.style.height = bbox.height + "px";
-            newElement.style.pointerEvents = "none";
-            newElement.style.boxSizing = "border-box";
-            newElement.style.zIndex = 2147483647;
-            // newElement.style.background = `${borderColor}80`;
+            let borderColor = getRandomColor();
+            const elementStyle = {
+                outline: `2px dashed ${borderColor}`,
+                position: 'fixed',
+                top: bbox.top + 'px',
+                left: bbox.left + 'px',
+                width: bbox.width + 'px',
+                height: bbox.height + 'px',
+                pointerEvents: 'none',
+                boxSizing: 'border-box',
+                zIndex: 2147483647,
+                // background: `${borderColor}80`
+            }
+            appendStyle(newElement, elementStyle);
+
             // Add floating label at the corner
-            var label = document.createElement("span");
-            label.textContent = index;
-            label.style.position = "absolute";
-            label.style.top = "-19px";
-            label.style.left = "0px";
-            label.style.background = borderColor;
-            label.style.color = "white";
-            label.style.padding = "2px 4px";
-            label.style.fontSize = "12px";
-            label.style.borderRadius = "2px";
-            newElement.appendChild(label);
+            if (bbox.width > 20 || bbox.height > 40) {
+                let label = document.createElement('span');
+                let labelStyle = {
+                    position: 'absolute',
+                    background: borderColor,
+                    color: 'white',
+                    padding: '2px 4px',
+                    fontSize: '12px',
+                    borderRadius: '2px',
+                    whiteSpace: 'nowrap',
+                    // left: '50%',
+                    // top: '0',
+                    // transform: 'translate(-50%, 0)',
+                    transform: `${bbox.top > 20 ? 'translate(-2px, -100%)' : 'translate(-100%, -2px)'}`,
+                }
+                appendStyle(label, labelStyle);
+                label.textContent = index;
+                newElement.appendChild(label);
+            }
 
             document.body.appendChild(newElement);
             labels.push(newElement);
